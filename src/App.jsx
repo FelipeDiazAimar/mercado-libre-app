@@ -1,25 +1,30 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Header from './components/Header';
 import Home from './pages/Home';
-import ProductDetail from './pages/ProductDetail';
 import SearchResults from './pages/SearchResults';
-import Navbar from './components/Navbar';
-import Footer from './components/Footer';
+import ProductView from './pages/ProductView';
+import CartPage from './pages/CartPage';
+import Categories from './pages/Categories';
+import CategoryProducts from './pages/CategoryProducts';
+import { CartProvider } from './context/CartContext';
 
 function App() {
   return (
-    <Router>
-      <div className="app">
-        <Navbar />
-        <main className="container mt-4">
+    <CartProvider>
+      <Router>
+        <Header />
+        <div className="container mt-4">
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/items/:id" element={<ProductDetail />} />
-            <Route path="/search/:query" element={<SearchResults />} />
+            <Route path="/search" element={<SearchResults />} />
+            <Route path="/product/:id" element={<ProductView />} />
+            <Route path="/cart" element={<CartPage />} />
+            <Route path="/categories" element={<Categories />} />
+            <Route path="/category/:categoryId" element={<CategoryProducts />} />
           </Routes>
-        </main>
-        <Footer />
-      </div>
-    </Router>
+        </div>
+      </Router>
+    </CartProvider>
   );
 }
 

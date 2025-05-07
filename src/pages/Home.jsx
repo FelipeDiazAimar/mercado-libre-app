@@ -1,42 +1,42 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { searchProducts } from '../services/api';
 import ProductCard from '../components/ProductCard';
-import LoadingSpinner from '../components/LoadingSpinner';
-import ErrorMessage from '../components/ErrorMessage';
+import Loader from '../components/Loader';
 
-function Home() {
-  const [products, setProducts] = useState([]);
+const Home = () => {
+  const [featuredProducts, setFeaturedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
+  
   useEffect(() => {
-    const fetchProducts = async () => {
+    const loadFeaturedProducts = async () => {
       try {
-        const response = await axios.get('https://api.mercadolibre.com/sites/MLA/search?q=iphone&limit=6');
-        setProducts(response.data.results);
-      } catch (err) {
-        setError(err.message);
+        // Podemos cargar productos destacados o populares
+        const products = await searchProducts('ofertas destacadas');
+        setFeaturedProducts(products.slice(0, 8)); // Tomamos los primeros 8
+      } catch (error) {
+        console.error('Error cargando productos destacados:', error);
       } finally {
         setLoading(false);
       }
     };
-
-    fetchProducts();
+    
+    loadFeaturedProducts();
   }, []);
-
-  if (loading) return <LoadingSpinner />;
-  if (error) return <ErrorMessage message={error} />;
-
+  
+  if (loading) return <Loader />;
+  
   return (
     <div>
-      <h1 className="mb-4">Productos destacados</h1>
-      <div className="row">
-        {products.map(product => (
-          <ProductCard key={product.id} product={product} />
+      <h2 className="mb-4">Productos Destacados</h2>
+      <div className="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+        {featuredProducts.map(product => (
+          <div className="col" key={product.id}>
+            <ProductCard product={product} />
+          </div>
         ))}
       </div>
     </div>
   );
-}
+};
 
 export default Home;
