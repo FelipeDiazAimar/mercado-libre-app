@@ -4,6 +4,7 @@ import { getProductById } from '../services/api';
 import { CartContext } from '../context/CartContext';
 import { toast } from 'react-toastify';
 import Loader from '../components/Loader';
+import { FaArrowLeft, FaArrowRight, FaTruck, FaUndo, FaShieldAlt, FaFire, FaBoxOpen } from 'react-icons/fa';
 import './ProductDetail.css';
 
 const ProductDetail = () => {
@@ -14,19 +15,35 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
   const [description, setDescription] = useState('');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [transitionDirection, setTransitionDirection] = useState('');
+  const [randomAttributes, setRandomAttributes] = useState([]);
 
   useEffect(() => {
     const fetchProductData = async () => {
       try {
         setLoading(true);
         const productData = await getProductById(id);
-        setProduct(productData);
+        
+        // Normalización de propiedades
+        const normalizedProduct = {
+          ...productData,
+          discountPercentage: productData.discountPercentage || 
+                            productData.discount_percentage ||
+                            (productData.original_price && productData.price ? 
+                              Math.round((1 - productData.price / productData.original_price) * 100) : 
+                              0)
+        };
+        
+        setProduct(normalizedProduct);
         
         const productDescription = productData.description || 
                                  productData.descripcion || 
                                  productData.details || 
                                  '';
         setDescription(productDescription);
+
+        // Generar atributos aleatorios
+        generateRandomAttributes();
       } catch (error) {
         console.error("Error fetching product:", error);
         toast.error('Error al cargar el producto', {
@@ -35,6 +52,63 @@ const ProductDetail = () => {
       } finally {
         setLoading(false);
       }
+    };
+
+    const generateRandomAttributes = () => {
+      const possibleAttributes = [
+        { 
+          name: 'Envío', 
+          values: ['Envío gratis', 'Envío con costo', 'Envío express'], 
+          icons: [<FaTruck className="attribute-icon" />, <FaTruck className="attribute-icon" />, <FaTruck className="attribute-icon" />],
+          weights: [70, 20, 10] 
+        },
+        { 
+          name: 'Devolución', 
+          values: ['Devolución gratis', 'Devolución con costo', 'No acepta devoluciones'], 
+          icons: [<FaUndo className="attribute-icon" />, <FaUndo className="attribute-icon" />, <FaUndo className="attribute-icon" />],
+          weights: [60, 30, 10] 
+        },
+        { 
+          name: 'Garantía', 
+          values: ['Garantía de 12 meses', 'Garantía de 6 meses', 'Sin garantía'], 
+          icons: [<FaShieldAlt className="attribute-icon" />, <FaShieldAlt className="attribute-icon" />, <FaShieldAlt className="attribute-icon" />],
+          weights: [50, 30, 20] 
+        },
+        { 
+          name: 'Disponibilidad', 
+          values: ['En stock', 'Stock limitado', 'Últimas unidades'], 
+          icons: [<FaBoxOpen className="attribute-icon" />, <FaBoxOpen className="attribute-icon" />, <FaBoxOpen className="attribute-icon" />],
+          weights: [60, 30, 10] 
+        },
+        { 
+          name: 'Popularidad', 
+          values: ['Muy popular', 'Popular', 'Poco popular'], 
+          icons: [<FaFire className="attribute-icon" />, <FaFire className="attribute-icon" />, <FaFire className="attribute-icon" />],
+          weights: [40, 40, 20] 
+        }
+      ];
+
+      const selectedAttributes = possibleAttributes.map(attr => {
+        const totalWeight = attr.weights.reduce((a, b) => a + b, 0);
+        let random = Math.random() * totalWeight;
+        let selectedIndex = 0;
+        
+        for (let i = 0; i < attr.weights.length; i++) {
+          if (random < attr.weights[i]) {
+            selectedIndex = i;
+            break;
+          }
+          random -= attr.weights[i];
+        }
+        
+        return {
+          name: attr.name,
+          value: attr.values[selectedIndex],
+          icon: attr.icons[selectedIndex]
+        };
+      });
+
+      setRandomAttributes(selectedAttributes);
     };
 
     fetchProductData();
@@ -65,6 +139,23 @@ const ProductDetail = () => {
     setCurrentImageIndex(index);
   };
 
+  const navigateImages = (direction) => {
+    setTransitionDirection(direction);
+    
+    setTimeout(() => {
+      if (direction === 'next') {
+        setCurrentImageIndex(prev => 
+          prev === allImages.length - 1 ? 0 : prev + 1
+        );
+      } else {
+        setCurrentImageIndex(prev => 
+          prev === 0 ? allImages.length - 1 : prev - 1
+        );
+      }
+      setTransitionDirection('');
+    }, 300);
+  };
+
   if (loading) return <Loader />;
   if (!product) return <div className="product-not-found">Producto no encontrado</div>;
 
@@ -72,6 +163,12 @@ const ProductDetail = () => {
     product.thumbnail,
     ...(product.images || [])
   ].filter(Boolean);
+
+  // Calcular descuento si hay diferencia de precios
+  const showDiscount = product.original_price && product.price < product.original_price;
+  const discountPercentage = showDiscount ? 
+    Math.round((1 - product.price / product.original_price) * 100) : 
+    product.discountPercentage || 0;
 
   return (
     <div className="product-detail-container">
@@ -81,9 +178,27 @@ const ProductDetail = () => {
             <img 
               src={allImages[currentImageIndex] || 'https://via.placeholder.com/600'} 
               alt={product.title} 
-              className="main-image"
+              className={`main-image ${transitionDirection}`}
               loading="lazy"
             />
+            {allImages.length > 1 && (
+              <>
+                <button 
+                  className="nav-arrow left-arrow"
+                  onClick={() => navigateImages('prev')}
+                  aria-label="Imagen anterior"
+                >
+                  <FaArrowLeft />
+                </button>
+                <button 
+                  className="nav-arrow right-arrow"
+                  onClick={() => navigateImages('next')}
+                  aria-label="Siguiente imagen"
+                >
+                  <FaArrowRight />
+                </button>
+              </>
+            )}
           </div>
           
           {allImages.length > 1 && (
@@ -110,22 +225,37 @@ const ProductDetail = () => {
           
           <div className="price-section">
             <span className="current-price">${product.price?.toLocaleString()}</span>
-            {product.original_price && (
-              <span className="original-price">${product.original_price.toLocaleString()}</span>
-            )}
-            {product.discountPercentage && (
-              <span className="discount-badge">{Math.round(product.discountPercentage)}% OFF</span>
+            
+            {showDiscount && (
+              <div className="price-comparison">
+                <span className="original-price">${product.original_price.toLocaleString()}</span>
+                <span className="discount-badge">{discountPercentage}% OFF</span>
+              </div>
             )}
           </div>
 
-          {product.shipping?.free_shipping && (
-            <div className="free-shipping-badge">Envío gratis</div>
-          )}
+          <div className="attributes-table">
+            <h3 className="attributes-title">Características del producto</h3>
+            <table className="attributes-grid">
+              <tbody>
+                {randomAttributes.map((attr, index) => (
+                  <tr key={index} className="attribute-row">
+                    <td className="attribute-name">
+                      {attr.icon}
+                      <span>{attr.name}</span>
+                    </td>
+                    <td className="attribute-value">{attr.value}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
-          <div className="quantity-selector">
-            <label>Cantidad:</label>
+          <div className="quantity-section">
+            <h3 className="quantity-title">Cantidad:</h3>
             <div className="quantity-controls">
               <button 
+                className="quantity-btn"
                 onClick={() => setQuantity(prev => Math.max(1, prev - 1))}
                 disabled={quantity <= 1}
               >
@@ -133,39 +263,33 @@ const ProductDetail = () => {
               </button>
               <input 
                 type="number" 
+                className="quantity-input"
                 value={quantity}
                 onChange={handleQuantityChange}
                 min="1"
                 max={product.available_quantity || 10}
               />
               <button 
+                className="quantity-btn"
                 onClick={() => setQuantity(prev => Math.min(product.available_quantity || 10, prev + 1))}
                 disabled={quantity >= (product.available_quantity || 10)}
               >
                 +
               </button>
             </div>
+            <p className="stock-available">
+              {product.available_quantity ? 
+                `(${product.available_quantity} disponibles)` : 
+                '(Stock disponible)'}
+            </p>
           </div>
 
           <button 
-            className="add-to-cart-btn"
+            className="add-to-cart-btn primary-btn"
             onClick={handleAddToCart}
           >
             Agregar al carrito
           </button>
-
-          {product.attributes?.length > 0 && (
-            <div className="product-attributes">
-              <h3>Características principales</h3>
-              <ul>
-                {product.attributes.slice(0, 6).map(attr => (
-                  <li key={attr.name}>
-                    <strong>{attr.name}:</strong> {attr.value_name || attr.value}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
         </div>
       </div>
 
