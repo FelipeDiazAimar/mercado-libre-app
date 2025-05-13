@@ -1,0 +1,30 @@
+/* Estilos para el botón de volver */
+.back-to-search-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 8px 16px;
+  margin-bottom: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #333;
+  font-size: 14px;
+}
+
+.back-to-search-btn:hover {
+  background: #e9ecef;
+  border-color: #adb5bd;
+}
+
+.back-icon {
+  font-size: 12px;
+}
+
+.product-view-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}

@@ -1,98 +1,60 @@
-import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { getProductDetails, getProductDescription } from '../services/api';
-import ProductDetail from '../components/ProductDetail';
+import { useEffect, useState } from 'react';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { getProductById } from '../services/api';
 import Loader from '../components/Loader';
+import ProductDetail from '../components/ProductDetail';
+import { FaArrowLeft } from 'react-icons/fa';
+import './ProductView.css'; // Asegúrate de crear este archivo para los estilos
 
-const ProductView = () => {
-  const { id } = useParams();
+function ProductView() {
   const [product, setProduct] = useState(null);
-  const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [quantity, setQuantity] = useState(1);
-  
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Obtener el término de búsqueda previo (si existe)
+  const searchQuery = new URLSearchParams(location.state?.fromSearch || '').get('q') || '';
+  const fromSearchPage = location.state?.from === 'search';
+
   useEffect(() => {
-    const loadProductDetails = async () => {
-      setLoading(true);
-      setError(null);
-      
-      try {
-        // Usar la API específica que mencionaste para MLA1377454181
-        // Aquí usamos el ID dinámico de los parámetros de ruta
-        const productData = await getProductDetails(id);
-        setProduct(productData);
-        
-        // Obtener la descripción del producto
-        const descriptionData = await getProductDescription(id);
-        setDescription(descriptionData.plain_text || '');
-      } catch (error) {
-        console.error('Error cargando detalles del producto:', error);
-        setError('No pudimos cargar los detalles del producto. Por favor, intenta nuevamente.');
-      } finally {
-        setLoading(false);
-      }
+    const loadProduct = async () => {
+      const data = await getProductById(id);
+      setProduct(data);
+      setLoading(false);
     };
-    
-    if (id) {
-      loadProductDetails();
-    }
+    loadProduct();
   }, [id]);
-  
+
+  const handleBackToSearch = () => {
+    // Navegar a la página anterior o a la búsqueda si viene de ahí
+    if (fromSearchPage && searchQuery) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery)}`, { 
+        state: { from: 'product' } 
+      });
+    } else {
+      navigate(-1); // Volver a la página anterior genérica
+    }
+  };
+
   if (loading) return <Loader />;
-  
-  if (error) {
-    return (
-      <div className="alert alert-danger">
-        <h4>Error</h4>
-        <p>{error}</p>
-      </div>
-    );
-  }
-  
-  if (!product) {
-    return (
-      <div className="alert alert-warning">
-        Producto no encontrado. El ID proporcionado no existe o no está disponible.
-      </div>
-    );
-  }
-  
+  if (!product) return <div>Producto no encontrado</div>;
+
   return (
-    <div className="container my-4">
-      <nav aria-label="breadcrumb">
-        <ol className="breadcrumb">
-          <li className="breadcrumb-item"><a href="/">Inicio</a></li>
-          {product.category_id && (
-            <li className="breadcrumb-item">
-              <a href={`/category/${product.category_id}`}>
-                {product.category_id}
-              </a>
-            </li>
-          )}
-          <li className="breadcrumb-item active" aria-current="page">{product.title}</li>
-        </ol>
-      </nav>
+    <div className="product-view-container">
+      <button 
+        onClick={handleBackToSearch}
+        className="back-to-search-btn"
+      >
+        <FaArrowLeft className="back-icon" />
+        {fromSearchPage && searchQuery 
+          ? `Volver a resultados para "${searchQuery}"` 
+          : 'Volver atrás'}
+      </button>
       
-      <ProductDetail 
-        product={product} 
-        description={description}
-        quantity={quantity}
-        setQuantity={setQuantity}
-      />
-      
-      {/* Sección adicional para mostrar productos relacionados */}
-      {product.catalog_product_id && (
-        <div className="mt-5">
-          <h3>Productos similares</h3>
-          <div className="alert alert-info">
-            Para implementar esta sección, puedes usar:
-            <code>https://api.mercadolibre.com/products/{product.catalog_product_id}/items</code>
-          </div>
-        </div>
-      )}
+      <ProductDetail product={product} />
     </div>
   );
-};
+}
 
 export default ProductView;

@@ -1,31 +1,44 @@
+import React from 'react';
 import { Link } from 'react-router-dom';
+import './ProductCard.css';
 
-const ProductCard = ({ product }) => {
-  return (
-    <div className="card h-100">
-      <img 
-        src={product.thumbnail} 
-        className="card-img-top p-3" 
-        alt={product.title} 
-        style={{ objectFit: 'contain', height: '200px' }}
-      />
-      <div className="card-body d-flex flex-column">
-        <h5 className="card-title">{product.title}</h5>
-        <p className="card-text text-success fw-bold fs-4">
-          ${product.price.toLocaleString()}
-        </p>
-        {product.shipping.free_shipping && (
-          <p className="text-success">Envío gratis</p>
-        )}
+const ProductCard = ({ product, state, showDescription = false }) => {
+    return (
         <Link 
-          to={`/product/${product.id}`} 
-          className="btn btn-primary mt-auto"
+            to={`/product/${product.id}`}
+            state={state}  // Pasa el estado de navegación (para el botón "Volver")
+            className="product-card"
         >
-          Ver detalles
+            <div className="product-image-container">
+                <img
+                    src={product.thumbnail || 'https://via.placeholder.com/300'}
+                    alt={product.title}
+                    className="product-image"
+                    loading="lazy"
+                />
+
+            </div>
+            <div className="product-info">
+                <h3 className="product-title">{product.title || 'Sin nombre'}</h3>
+                <div className="price-container">
+                    <span className="current-price">${product.price?.toLocaleString() || 'N/A'}</span>
+                    {product.original_price && (
+                        <span className="original-price">${product.original_price.toLocaleString()}</span>
+                    )}
+                </div>
+                {showDescription && product.description && (
+                    <p className="product-description">
+                        {product.description.length > 100 
+                            ? `${product.description.substring(0, 100)}...`
+                            : product.description}
+                    </p>
+                )}
+                {product.shipping?.free_shipping && (
+                    <div className="free-shipping">Envío gratis</div>
+                )}
+            </div>
         </Link>
-      </div>
-    </div>
-  );
+    );
 };
 
-export default ProductCard;
+export default React.memo(ProductCard);

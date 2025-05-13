@@ -1,136 +1,185 @@
-import { useContext } from 'react';
+import { useContext, useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { getProductById } from '../services/api';
 import { CartContext } from '../context/CartContext';
+import { toast } from 'react-toastify';
+import Loader from '../components/Loader';
+import './ProductDetail.css';
 
-const ProductDetail = ({ product, description, quantity, setQuantity }) => {
+const ProductDetail = () => {
+  const { id } = useParams();
   const { addToCart } = useContext(CartContext);
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [quantity, setQuantity] = useState(1);
+  const [description, setDescription] = useState('');
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  useEffect(() => {
+    const fetchProductData = async () => {
+      try {
+        setLoading(true);
+        const productData = await getProductById(id);
+        setProduct(productData);
+        
+        const productDescription = productData.description || 
+                                 productData.descripcion || 
+                                 productData.details || 
+                                 '';
+        setDescription(productDescription);
+      } catch (error) {
+        console.error("Error fetching product:", error);
+        toast.error('Error al cargar el producto', {
+          position: "bottom-right",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProductData();
+  }, [id]);
 
   const handleAddToCart = () => {
     addToCart(product, quantity);
-    alert(`${quantity} ${product.title} agregado al carrito`);
+    toast.success(
+      <div>
+        <strong>{quantity} {product.title}</strong> agregado al carrito
+        <br />
+        <small>Subtotal: ${(product.price * quantity).toLocaleString()}</small>
+      </div>, 
+      {
+        icon: "🛒",
+        position: "bottom-right",
+      }
+    );
   };
 
+  const handleQuantityChange = (e) => {
+    const value = Math.max(1, parseInt(e.target.value) || 1);
+    const maxQuantity = product?.available_quantity || 10;
+    setQuantity(Math.min(value, maxQuantity));
+  };
+
+  const handleThumbnailClick = (index) => {
+    setCurrentImageIndex(index);
+  };
+
+  if (loading) return <Loader />;
+  if (!product) return <div className="product-not-found">Producto no encontrado</div>;
+
+  const allImages = [
+    product.thumbnail,
+    ...(product.images || [])
+  ].filter(Boolean);
+
   return (
-    <div className="product-detail">
-      <div className="row">
-        <div className="col-md-6">
-          <div className="product-images">
-            {product.pictures && product.pictures.length > 0 ? (
-              <img 
-                src={product.pictures[0].url} 
-                alt={product.title} 
-                className="img-fluid rounded main-image"
-              />
-            ) : (
-              <img 
-                src={product.thumbnail} 
-                alt={product.title} 
-                className="img-fluid rounded main-image"
-              />
+    <div className="product-detail-container">
+      <div className="product-main">
+        <div className="product-gallery">
+          <div className="main-image-container">
+            <img 
+              src={allImages[currentImageIndex] || 'https://via.placeholder.com/600'} 
+              alt={product.title} 
+              className="main-image"
+              loading="lazy"
+            />
+          </div>
+          
+          {allImages.length > 1 && (
+            <div className="thumbnail-grid">
+              {allImages.map((img, index) => (
+                <img
+                  key={index}
+                  src={img}
+                  alt={`${product.title} - ${index + 1}`}
+                  className={`thumbnail ${index === currentImageIndex ? 'active' : ''}`}
+                  onClick={() => handleThumbnailClick(index)}
+                  loading="lazy"
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="product-info">
+          <span className="product-condition">
+            {product.condition === 'new' ? 'Nuevo' : 'Usado'} | {product.sold_quantity || 0} vendidos
+          </span>
+          <h1 className="product-title">{product.title}</h1>
+          
+          <div className="price-section">
+            <span className="current-price">${product.price?.toLocaleString()}</span>
+            {product.original_price && (
+              <span className="original-price">${product.original_price.toLocaleString()}</span>
             )}
-            
-            {product.pictures && product.pictures.length > 1 && (
-              <div className="thumbnail-gallery d-flex mt-3">
-                {product.pictures.slice(0, 4).map((pic, index) => (
-                  <img 
-                    key={index}
-                    src={pic.url} 
-                    alt={`${product.title} - imagen ${index + 1}`}
-                    className="img-thumbnail me-2"
-                    style={{ width: '70px', cursor: 'pointer' }}
-                  />
-                ))}
-              </div>
+            {product.discountPercentage && (
+              <span className="discount-badge">{Math.round(product.discountPercentage)}% OFF</span>
             )}
           </div>
-        </div>
-        
-        <div className="col-md-6">
-          <div className="product-info">
-            <span className="text-muted">
-              {product.condition === 'new' ? 'Nuevo' : 'Usado'} | {product.sold_quantity} vendidos
-            </span>
-            <h1 className="h3 mb-2">{product.title}</h1>
-            
-            <div className="price mb-3">
-              <span className="text-success fw-bold fs-3">${product.price.toLocaleString()}</span>
-              {product.original_price && (
-                <span className="text-decoration-line-through text-muted ms-2">
-                  ${product.original_price.toLocaleString()}
-                </span>
-              )}
-            </div>
-            
-            {product.shipping?.free_shipping && (
-              <div className="badge bg-success mb-3">Envío gratis</div>
-            )}
-            
-            <div className="stock mb-3">
-              <span className="text-dark">
-                Stock disponible: {product.available_quantity} unidades
-              </span>
-            </div>
-            
-            <div className="quantity mb-3">
-              <label className="form-label">Cantidad:</label>
-              <div className="input-group" style={{ maxWidth: "150px" }}>
-                <button 
-                  className="btn btn-outline-secondary" 
-                  type="button"
-                  onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                  disabled={quantity <= 1}
-                >-</button>
-                <input 
-                  type="number" 
-                  className="form-control text-center" 
-                  value={quantity}
-                  onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                  min="1"
-                  max={product.available_quantity}
-                />
-                <button 
-                  className="btn btn-outline-secondary" 
-                  type="button"
-                  onClick={() => setQuantity(q => Math.min(product.available_quantity, q + 1))}
-                  disabled={quantity >= product.available_quantity}
-                >+</button>
-              </div>
-            </div>
-            
-            <div className="d-grid gap-2 mb-4">
+
+          {product.shipping?.free_shipping && (
+            <div className="free-shipping-badge">Envío gratis</div>
+          )}
+
+          <div className="quantity-selector">
+            <label>Cantidad:</label>
+            <div className="quantity-controls">
               <button 
-                className="btn btn-primary" 
-                onClick={handleAddToCart}
+                onClick={() => setQuantity(prev => Math.max(1, prev - 1))}
+                disabled={quantity <= 1}
               >
-                Agregar al carrito
+                -
+              </button>
+              <input 
+                type="number" 
+                value={quantity}
+                onChange={handleQuantityChange}
+                min="1"
+                max={product.available_quantity || 10}
+              />
+              <button 
+                onClick={() => setQuantity(prev => Math.min(product.available_quantity || 10, prev + 1))}
+                disabled={quantity >= (product.available_quantity || 10)}
+              >
+                +
               </button>
             </div>
-            
-            {product.attributes && product.attributes.length > 0 && (
-              <div className="attributes mb-4">
-                <h5>Características:</h5>
-                <div className="row">
-                  {product.attributes.slice(0, 6).map(attr => (
-                    <div className="col-6 mb-2" key={attr.id}>
-                      <strong>{attr.name}:</strong> {attr.value_name}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
+
+          <button 
+            className="add-to-cart-btn"
+            onClick={handleAddToCart}
+          >
+            Agregar al carrito
+          </button>
+
+          {product.attributes?.length > 0 && (
+            <div className="product-attributes">
+              <h3>Características principales</h3>
+              <ul>
+                {product.attributes.slice(0, 6).map(attr => (
+                  <li key={attr.name}>
+                    <strong>{attr.name}:</strong> {attr.value_name || attr.value}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </div>
-      
-      <div className="description mt-4">
-        <h4>Descripción</h4>
-        <div className="card">
-          <div className="card-body">
-            {description ? (
-              <p style={{ whiteSpace: 'pre-line' }}>{description}</p>
-            ) : (
-              <p className="text-muted">No hay descripción disponible para este producto.</p>
-            )}
-          </div>
+
+      <div className="product-description-section">
+        <h2>Descripción del producto</h2>
+        <div className="description-content">
+          {description ? (
+            <p>{description}</p>
+          ) : (
+            <p className="no-description">
+              Este producto no tiene descripción detallada todavía.
+              {product.brand && ` Marca: ${product.brand}`}
+            </p>
+          )}
         </div>
       </div>
     </div>

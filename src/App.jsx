@@ -7,22 +7,45 @@ import CartPage from './pages/CartPage';
 import Categories from './pages/Categories';
 import CategoryProducts from './pages/CategoryProducts';
 import { CartProvider } from './context/CartContext';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import './App.css';
+import Footer from './components/Footer';
 
 function App() {
   return (
     <CartProvider>
       <Router>
-        <Header />
-        <div className="container mt-4">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/search" element={<SearchResults />} />
-            <Route path="/product/:id" element={<ProductView />} />
-            <Route path="/cart" element={<CartPage />} />
-            <Route path="/categories" element={<Categories />} />
-            <Route path="/category/:categoryId" element={<CategoryProducts />} />
-          </Routes>
+        <div className="app-container">
+          <Header />
+          <main className="main-content">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/search" element={<SearchResults />} />
+              <Route path="/product/:id" element={<ProductView />} />
+              <Route path="/cart" element={<CartPage />} />
+              <Route path="/categories" element={<Categories />} />
+              <Route path="/category/:category" element={<CategoryProducts />} />
+            </Routes>
+          </main>
+          <Footer />
         </div>
+        <ToastContainer 
+          position="bottom-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="colored"
+          toastStyle={{
+            backgroundColor: '#28a745',
+            color: 'white',
+          }}
+        />
       </Router>
     </CartProvider>
   );
