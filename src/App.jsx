@@ -6,6 +6,7 @@ import ProductView from './pages/ProductView';
 import CartPage from './pages/CartPage';
 import Categories from './pages/Categories';
 import CategoryProducts from './pages/CategoryProducts';
+import CheckoutPage from './pages/CheckoutPage';
 import { CartProvider } from './context/CartContext';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -26,6 +27,7 @@ function App() {
               <Route path="/cart" element={<CartPage />} />
               <Route path="/categories" element={<Categories />} />
               <Route path="/category/:category" element={<CategoryProducts />} />
+              <Route path="/checkout" element={<CheckoutPage />} />
             </Routes>
           </main>
           <Footer />
