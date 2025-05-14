@@ -41,7 +41,7 @@ function Home() {
         <Loader />
       ) : (
         <>
-          <h2 className="section-title">Productos destacadas</h2>
+          <h2 className="section-title">Productos destacados</h2>
           <div className="products-grid">
             {products.map(product => (
               <div key={product.id} className="product-card-wrapper">
