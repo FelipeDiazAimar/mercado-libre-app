@@ -103,7 +103,6 @@
     grid-template-columns: 1fr;
   }
 }
-/* Añade estas reglas al archivo existente */
 
 .discount-badge {
   position: absolute;
@@ -145,7 +144,6 @@
   background: #f9f9f9;
 }
 
-/* Mantén tus estilos existentes y añade estos ajustes */
 .products-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));

@@ -1,4 +1,4 @@
-// pages/Categories.jsx
+
 import { useEffect, useState } from 'react';
 import { getCategories } from '../services/api';
 import Loader from '../components/Loader';

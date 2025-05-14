@@ -182,9 +182,9 @@
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  line-clamp: 2; /* <- Añade esta línea */
-  display: -moz-box; /* Soporte para Firefox */
-  -moz-box-orient: vertical; /* Soporte para Firefox */
+  line-clamp: 2; 
+  display: -moz-box; 
+  -moz-box-orient: vertical; 
 }
 
 .item-meta {

@@ -4,7 +4,7 @@ import { getProductById } from '../services/api';
 import Loader from '../components/Loader';
 import ProductDetail from '../components/ProductDetail';
 import { FaArrowLeft } from 'react-icons/fa';
-import './ProductView.css'; // Asegúrate de crear este archivo para los estilos
+import './ProductView.css'; 
 
 function ProductView() {
   const [product, setProduct] = useState(null);
@@ -12,8 +12,7 @@ function ProductView() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-
-  // Obtener el término de búsqueda previo (si existe)
+  // Obtener la query de búsqueda de la ubicación
   const searchQuery = new URLSearchParams(location.state?.fromSearch || '').get('q') || '';
   const fromSearchPage = location.state?.from === 'search';
 

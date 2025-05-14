@@ -4,7 +4,9 @@ import { getProductById } from '../services/api';
 import { CartContext } from '../context/CartContext';
 import { toast } from 'react-toastify';
 import Loader from '../components/Loader';
-import { FaArrowLeft, FaArrowRight, FaTruck, FaUndo, FaShieldAlt, FaFire, FaBoxOpen } from 'react-icons/fa';
+import { FaArrowLeft, FaArrowRight, FaTruck, FaShippingFast, FaUndo, FaMoneyBillWave, FaBan,
+  FaShieldAlt, FaCalendarAlt, FaTimes, FaBoxOpen, FaExclamationTriangle,
+  FaBox, FaStar, FaStarHalfAlt, FaRegStar } from 'react-icons/fa';
 import './ProductDetail.css';
 
 const ProductDetail = () => {
@@ -24,7 +26,6 @@ const ProductDetail = () => {
         setLoading(true);
         const productData = await getProductById(id);
         
-        // Normalización de propiedades
         const normalizedProduct = {
           ...productData,
           discountPercentage: productData.discountPercentage || 
@@ -42,7 +43,6 @@ const ProductDetail = () => {
                                  '';
         setDescription(productDescription);
 
-        // Generar atributos aleatorios
         generateRandomAttributes();
       } catch (error) {
         console.error("Error fetching product:", error);
@@ -58,33 +58,53 @@ const ProductDetail = () => {
       const possibleAttributes = [
         { 
           name: 'Envío', 
-          values: ['Envío gratis', 'Envío con costo', 'Envío express'], 
-          icons: [<FaTruck className="attribute-icon" />, <FaTruck className="attribute-icon" />, <FaTruck className="attribute-icon" />],
-          weights: [70, 20, 10] 
+          values: ['Envío gratis', 'Envío con costo', 'Envío express'],
+          icons: [
+            <FaTruck className="text-success" size={16} />,
+            <FaTruck className="text-warning" size={16} />, 
+            <FaShippingFast className="text-primary" size={16} />
+          ],
+          weights: [70, 20, 10]
         },
         { 
-          name: 'Devolución', 
-          values: ['Devolución gratis', 'Devolución con costo', 'No acepta devoluciones'], 
-          icons: [<FaUndo className="attribute-icon" />, <FaUndo className="attribute-icon" />, <FaUndo className="attribute-icon" />],
-          weights: [60, 30, 10] 
+          name: 'Devolución',
+          values: ['Devolución gratis', 'Devolución con costo', 'No acepta devoluciones'],
+          icons: [
+            <FaUndo className="text-success" size={16} />,
+            <FaMoneyBillWave className="text-warning" size={16} />,
+            <FaBan className="text-danger" size={16} />
+          ],
+          weights: [60, 30, 10]
         },
         { 
-          name: 'Garantía', 
-          values: ['Garantía de 12 meses', 'Garantía de 6 meses', 'Sin garantía'], 
-          icons: [<FaShieldAlt className="attribute-icon" />, <FaShieldAlt className="attribute-icon" />, <FaShieldAlt className="attribute-icon" />],
-          weights: [50, 30, 20] 
+          name: 'Garantía',
+          values: ['12 meses', '6 meses', 'Sin garantía'],
+          icons: [
+            <FaShieldAlt className="text-success" size={16} />,
+            <FaCalendarAlt className="text-warning" size={16} />,
+            <FaTimes className="text-secondary" size={16} />
+          ],
+          weights: [50, 30, 20]
         },
         { 
-          name: 'Disponibilidad', 
-          values: ['En stock', 'Stock limitado', 'Últimas unidades'], 
-          icons: [<FaBoxOpen className="attribute-icon" />, <FaBoxOpen className="attribute-icon" />, <FaBoxOpen className="attribute-icon" />],
-          weights: [60, 30, 10] 
+          name: 'Disponibilidad',
+          values: ['En stock', 'Últimas unidades'],
+          icons: [
+            <FaBoxOpen className="text-success" size={16} />,
+            <FaExclamationTriangle className="text-warning" size={16} />,
+            <FaBox className="text-danger" size={16} />
+          ],
+          weights: [60, 30, 10]
         },
         { 
-          name: 'Calificación del vendedor', 
-          values: ['Excelente', 'Bueno', 'Regular'], 
-          icons: [<FaFire className="attribute-icon" />, <FaFire className="attribute-icon" />, <FaFire className="attribute-icon" />],
-          weights: [40, 40, 20] 
+          name: 'Calificación vendedor',
+          values: ['Excelente', 'Bueno', 'Regular'],
+          icons: [
+            <FaStar className="text-warning" size={16} />,
+            <FaStarHalfAlt className="text-warning" size={16} />,
+            <FaRegStar className="text-warning" size={16} />
+          ],
+          weights: [40, 40, 20]
         }
       ];
 

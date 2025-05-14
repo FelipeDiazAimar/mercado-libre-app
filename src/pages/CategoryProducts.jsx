@@ -1,4 +1,4 @@
-// pages/CategoryProducts.jsx
+
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getProductsByCategory } from '../services/api';

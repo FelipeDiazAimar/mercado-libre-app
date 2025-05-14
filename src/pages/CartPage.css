@@ -1,4 +1,3 @@
-/* Estilos generales */
 .cart-container {
   max-width: 1200px;
   margin: 2rem auto;
@@ -8,10 +7,10 @@
 .cart-title {
   font-weight: 700;
   color: #2c3e50;
-  padding: 1.5rem 1rem; /* Añade padding arriba/abajo y laterales */
-  margin: 0 0 2rem 0; /* Espaciado inferior */
-  background: #f8f9fa; /* Fondo sutil (opcional) */
-  border-radius: 8px; /* Bordes redondeados */
+  padding: 1.5rem 1rem; 
+  margin: 0 0 2rem 0; 
+  background: #f8f9fa; 
+  border-radius: 8px; 
 }
 
 /* Tarjeta de producto */
@@ -68,7 +67,6 @@
   opacity: 0.2;
 }
 
-/* Resumen */
 .cart-summary {
   background: #f8f9fa;
   border: none;
