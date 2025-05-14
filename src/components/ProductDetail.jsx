@@ -81,8 +81,8 @@ const ProductDetail = () => {
           weights: [60, 30, 10] 
         },
         { 
-          name: 'Popularidad', 
-          values: ['Muy popular', 'Popular', 'Poco popular'], 
+          name: 'Calificación del vendedor', 
+          values: ['Excelente', 'Bueno', 'Regular'], 
           icons: [<FaFire className="attribute-icon" />, <FaFire className="attribute-icon" />, <FaFire className="attribute-icon" />],
           weights: [40, 40, 20] 
         }
