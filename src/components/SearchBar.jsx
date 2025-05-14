@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { searchProducts } from '../services/api';
+import './SearchBar.css';
 
 const SearchBar = ({ onSearch }) => {
   const [query, setQuery] = useState('');
@@ -8,7 +9,6 @@ const SearchBar = ({ onSearch }) => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Búsqueda con debounce
   useEffect(() => {
     if (query.trim().length < 2) {
       setSuggestions([]);
