@@ -4,14 +4,14 @@
 }
 
 .search-bar form {
-  display: flex; /* This is the key fix */
+  display: flex; 
   position: relative;
   --border-radius: 12px !important;
   background-color: #ffffff;
 }
 
 .search-bar input {
-  flex: 1; /* Takes remaining space */
+  flex: 1; 
   padding: 0.85rem 1.25rem;
   font-size: 1rem;
   line-height: 1.5;
@@ -19,7 +19,7 @@
   background-color: #f9fafb;
   border: 1px solid #e5e7eb;
   border-radius: var(--border-radius) 0 0 var(--border-radius);
-  border-right: none; /* Remove border between input and button */
+  border-right: none; 
   transition: all var(--transition-speed) ease;
 }
 
@@ -32,8 +32,8 @@
 }
 
 .search-bar button {
-  flex-shrink: 0; /* Prevents button from shrinking */
-  white-space: nowrap; /* Prevents text wrapping */
+  flex-shrink: 0; 
+  white-space: nowrap; 
   display: flex;
   align-items: center;
   justify-content: center;
@@ -114,7 +114,6 @@
   border-bottom-right-radius: var(--border-radius);
 }
 
-/* Micro-interaction for input loading state */
 @keyframes pulse {
   0%, 100% {
     opacity: 1;
