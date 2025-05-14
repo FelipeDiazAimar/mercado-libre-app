@@ -1,12 +1,41 @@
-# React + Vite
+# Mercado Libre App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+🌐 [Visitar la App en Vercel](https://mercado-libre-app-rust.vercel.app/)
 
-Currently, two official plugins are available:
+Este proyecto es una aplicación web inspirada en el diseño de Mercado Libre. Permite a los usuarios buscar productos, ver resultados detallados y acceder a información individual de cada ítem. Se desarrolló con el objetivo de practicar conceptos de diseño de interfaz, consumo de APIs y desarrollo frontend moderno.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🧩 Características principales
 
-## Expanding the ESLint configuration
+- Búsqueda de productos por palabra clave.
+- Visualización de resultados con imagen, título, precio y calificaciones.
+- Página de detalle del producto con información extendida.
+- Interfaz simple, rápida y responsive.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🔌 API utilizada
+
+Se utiliza la API pública de [DummyJSON](https://dummyjson.com/docs/products) para simular los datos de productos:
+- Endpoint principal: `/products/search?q=palabra`
+- Los datos incluyen nombre, imagen, descripción, precio, marca y más.
+
+## 🛠️ Tecnologías usadas
+
+- **HTML**
+- **CSS**
+- **JavaScript**
+- **React**
+- **Vite**
+- **Vercel** para el despliegue
+
+## 🚀 Cómo probarlo
+
+Podés acceder directamente a la aplicación funcionando en Vercel:
+
+👉 https://mercado-libre-app-rust.vercel.app/
+
+O bien clonar el repositorio y correrlo localmente con un servidor estático:
+
+```bash
+git clone https://github.com/tu-usuario/mercado-libre-app.git
+cd mercado-libre-app
+npm install
+npm run dev
