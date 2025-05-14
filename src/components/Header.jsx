@@ -36,11 +36,11 @@ const Header = () => {
             )}
             <FiChevronDown className={`dropdown-arrow ${showCartDropdown ? 'rotate' : ''}`} />
           </button>
-          
+
           {showCartDropdown && (
             <div className="cart-dropdown-panel">
-              <div className="dropdown-header">
-                <h3>Tu Carrito ({totalItems})</h3>
+              <div className="dropdown-header d-flex justify-content-between align-items-center">
+                <h3 className="m-0">Tu Carrito ({totalItems})</h3>
                 <button 
                   onClick={() => setShowCartDropdown(false)}
                   className="close-button"
